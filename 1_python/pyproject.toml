@@ -1,0 +1,11 @@
+[project]
+name = "1_python"
+version = "0.1.0"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.116.1",
+    "pydantic>=2.11.7",
+    "pydantic-settings>=2.10.1",
+    "streamlit>=1.48.0",
+]
