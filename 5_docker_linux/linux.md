@@ -83,13 +83,39 @@ key points:
 
 examples
 ```bash
-ssh foo@192.168.1.50
+ssh -i ~/.ssh/id_rsa foo@192.168.1.50 -p 8080
 ```
 - `foo` -> username on the remote system
 - `192.168.1.50` -> IP or domain of the remote machine
+- `-p 8080` -> port 8080
+- `-i ~/.ssh/id_rsa` -> key path (optional)
 
 ## SSH key authentication
 
 1. generate a key pair: `$ ssh-keygen` -> creates a private key `~/.ssh/id_rsa` and a public key `~/.ssh/id_rsa.pub`
 2. copy your public key to the remote server `$ ssh-copy-id foo@192.168.1.50`
 3. now can log in without a password with `$ssh foo@192.168.1.50`
+
+### additional
+
+each machine can have many SSH keys
+
+an SSH key is a file pair (private + public), and you can generate many of those for different purposes
+
+1. generate a new key with a custom name
+```bash
+ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_new -C "your_email@example.com"
+```
+- `-t ed25519` -> key type
+- `-f ~/.ssh/id_ed25519_new` -> save with a different filename
+- `-C` -> a comment to help identify the key
+
+2. add the new public key to the remote sever
+```bash
+ssh-copy-id -i ~/.ssh/id_ed25519_new user@server
+```
+
+3. use when connecting
+```bash
+ssh -i ~/.ssh/id_ed25519_new user@server
+```
