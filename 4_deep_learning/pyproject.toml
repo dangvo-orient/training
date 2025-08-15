@@ -1,0 +1,15 @@
+[project]
+name = "4-deep-learning"
+version = "0.1.0"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "ipykernel>=6.30.1",
+    "tensorflow-cpu>=2.18.0",
+    "torch>=2.8.0",
+]
+
+[dependency-groups]
+dev = [
+    "types-tensorflow>=2.18.0.20250809",
+]
