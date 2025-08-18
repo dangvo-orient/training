@@ -58,3 +58,45 @@ traditionally, each AI agent or framework had its own plugin/integration format 
 5. security
     - permissions and scopes are part of the protocol
     - tools declare what they expose, and models can enforce policies
+
+# a2a framework
+
+## server
+
+- agent skills: describes a specific capability or function the agent can perform -> tell clients what kinds of tasks the agent is good for
+- agent cars: JSON document
+    - `url`: where the agent runs at
+    - `capabilities` param:
+        - push_notifications: whether the agent can send asynchronous updates (via webhooks) to clients about task status
+        - state_transition_history: whether the agent tracks and exposes the full history of task state transitions
+        - streaming: supports real-time, incremental updates via SSE
+    - `supports_authenticated_extended_card`: signals whether the agent can serve an extended version of its agent card when requested by an authenticated client
+
+- agent executor: 2 primary methods
+    - `async def execute (self, context: RequestContext, event_queue: EventQueue)`: handles incoming request that expect a response or a stream of events
+        - processes user's input (via `context`) and uses `event_queue` to send back `Message`, `Task`, `TaskStatusUpdateEvent`, or `TaskArtifactUpdateEvent` objects
+    - `async def cancel(self, context: RequestContext, event_queue: EventQueue)`: handles requests to cancel an ongoing task
+
+    -> `RequestContext`: provides information about the incoming request, `EventQueue`: used by the executor to send events back to the client
+
+- `DefaultRequestHandler`: takes `AgentExecutor` and a `TaskStore`
+    - `taskStore`: manages lifecycle of tasks, especially for stateful interactions, streaming
+
+## client
+
+1. fetch the AgentCard & initialize the client
+
+```python
+base_url = 'http://localhost:9999'
+
+async with httpx.AsyncClient() as httpx_client:
+    # Initialize A2ACardResolver
+    resolver = A2ACardResolver(
+        httpx_client=httpx_client,
+        base_url=base_url,
+        # agent_card_path uses default, extended_agent_card_path also uses default
+    )
+```
+
+- `A2ACardResolver`: fetches agent cards (public or extended) from provided base paths, provides the flexibility for using authenticated endpoints when needed
+- `A2AClient`: client-side interface to interact with an A2A agent -> encapsulates HTTP communication with the agent endpoints and simplifies common actions
